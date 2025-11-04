@@ -104,4 +104,35 @@ class IndexerTest extends WP_UnitTestCase {
 		$this->indexer->delete_post_index( $post_id );
 		$this->assertFalse( $this->repository->has_embeddings( $post_id ) );
 	}
+
+	/**
+	 * Test reindex all posts processes all posts, not just first batch
+	 */
+	public function test_reindex_all_posts_processes_all_posts() {
+		// Create 150 posts to exceed the default batch size of 100.
+		$post_ids = array();
+		for ( $i = 0; $i < 150; $i++ ) {
+			$post_ids[] = $this->factory->post->create(
+				array(
+					'post_status' => 'publish',
+					'post_title'  => "Test Post $i",
+					'post_content' => "Content for test post $i",
+				)
+			);
+		}
+
+		// Reindex all posts with batch size of 50.
+		$count = $this->indexer->reindex_all_posts( 50, true );
+
+		// Verify all 150 posts were indexed.
+		$this->assertEquals( 150, $count, 'All 150 posts should be indexed' );
+
+		// Verify that all posts have embeddings.
+		foreach ( $post_ids as $post_id ) {
+			$this->assertTrue(
+				$this->repository->has_embeddings( $post_id ),
+				"Post $post_id should have embeddings"
+			);
+		}
+	}
 }

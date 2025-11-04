@@ -118,23 +118,37 @@ class Indexer {
 	 * @return int Number of posts indexed
 	 */
 	public function reindex_all_posts( int $batch_size = 100, bool $force_reindex = false ): int {
-		$args = array(
-			'post_type'      => array( 'post', 'page' ),
-			'post_status'    => 'publish',
-			'posts_per_page' => $batch_size,
-			'fields'         => 'ids',
-			'no_found_rows'  => true,
-		);
+		$total_count = 0;
+		$offset      = 0;
+		$has_more    = true;
 
-		$query = new \WP_Query( $args );
-		$count = 0;
+		while ( $has_more ) {
+			$args = array(
+				'post_type'      => array( 'post', 'page' ),
+				'post_status'    => 'publish',
+				'posts_per_page' => $batch_size,
+				'offset'         => $offset,
+				'fields'         => 'ids',
+				'no_found_rows'  => false,
+			);
 
-		if ( $query->have_posts() ) {
-			$result = $this->index_posts( $query->posts, $force_reindex );
-			$count  = $result['success'];
+			$query = new \WP_Query( $args );
+
+			if ( $query->have_posts() ) {
+				$result       = $this->index_posts( $query->posts, $force_reindex );
+				$total_count += $result['success'];
+				$offset      += $batch_size;
+
+				// If we got fewer posts than the batch size, we're done.
+				if ( count( $query->posts ) < $batch_size ) {
+					$has_more = false;
+				}
+			} else {
+				$has_more = false;
+			}
 		}
 
-		return $count;
+		return $total_count;
 	}
 
 	/**
