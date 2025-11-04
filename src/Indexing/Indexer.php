@@ -120,8 +120,9 @@ class Indexer {
 	public function reindex_all_posts( int $batch_size = 100, bool $force_reindex = false ): int {
 		$total_count = 0;
 		$offset      = 0;
+		$has_more    = true;
 
-		do {
+		while ( $has_more ) {
 			$args = array(
 				'post_type'      => array( 'post', 'page' ),
 				'post_status'    => 'publish',
@@ -137,10 +138,15 @@ class Indexer {
 				$result       = $this->index_posts( $query->posts, $force_reindex );
 				$total_count += $result['success'];
 				$offset      += $batch_size;
+
+				// If we got fewer posts than the batch size, we're done.
+				if ( count( $query->posts ) < $batch_size ) {
+					$has_more = false;
+				}
 			} else {
-				break;
+				$has_more = false;
 			}
-		} while ( $query->have_posts() );
+		}
 
 		return $total_count;
 	}
