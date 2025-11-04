@@ -134,6 +134,10 @@ register_uninstall_hook( __FILE__, __NAMESPACE__ . '\\uninstall' );
 function invalidate_cache_on_post_save( int $post_id ): void {
 	$cache = new Cache\CacheManager();
 	$cache->invalidate_post( $post_id );
+
+	// Invalidate fuzzy search cache.
+	$fuzzy = new Search\FuzzySearch();
+	$fuzzy->invalidate_cache();
 }
 
 /**
@@ -144,4 +148,8 @@ function invalidate_cache_on_post_save( int $post_id ): void {
 function invalidate_cache_on_post_delete( int $post_id ): void {
 	$cache = new Cache\CacheManager();
 	$cache->invalidate_post( $post_id );
+
+	// Invalidate fuzzy search cache.
+	$fuzzy = new Search\FuzzySearch();
+	$fuzzy->invalidate_cache();
 }

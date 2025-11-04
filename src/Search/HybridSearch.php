@@ -31,6 +31,13 @@ class HybridSearch {
 	private SemanticSearch $semantic_search;
 
 	/**
+	 * Fuzzy search instance
+	 *
+	 * @var FuzzySearch|null
+	 */
+	private ?FuzzySearch $fuzzy_search = null;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -101,7 +108,24 @@ class HybridSearch {
 		);
 
 		// Step 4: Format and return.
-		return $this->format_results( $combined, $args['limit'] );
+		$results = $this->format_results( $combined, $args['limit'] );
+
+		// Step 5: Fuzzy search fallback if no results.
+		if ( empty( $results ) && apply_filters( 'ihumbak_semantic_search_enable_fuzzy', true ) ) {
+			$fuzzy_ids = $this->get_fuzzy_search()->search( $query );
+			if ( ! empty( $fuzzy_ids ) ) {
+				foreach ( $fuzzy_ids as $post_id ) {
+					$results[] = array(
+						'post_id' => $post_id,
+						'score'   => 0.5,
+						'type'    => 'fuzzy',
+					);
+				}
+				$results = $this->format_results( $results, $args['limit'] );
+			}
+		}
+
+		return $results;
 	}
 
 	/**
@@ -250,6 +274,19 @@ class HybridSearch {
 		);
 
 		return $this->format_results( $semantic_results, $args['limit'] );
+	}
+
+	/**
+	 * Get fuzzy search instance
+	 *
+	 * @return FuzzySearch Fuzzy search instance
+	 */
+	protected function get_fuzzy_search(): FuzzySearch {
+		if ( null === $this->fuzzy_search ) {
+			$this->fuzzy_search = new FuzzySearch();
+		}
+
+		return $this->fuzzy_search;
 	}
 
 	/**
