@@ -1,0 +1,30 @@
+# WordPress
+.htaccess
+wp-config.php
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/
+
+# Composer
+/vendor/
+
+# Node
+/node_modules/
+/build/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+*.zip
+
+# Testing
+/tmp/
+/tests/wordpress/
