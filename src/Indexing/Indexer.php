@@ -118,23 +118,31 @@ class Indexer {
 	 * @return int Number of posts indexed
 	 */
 	public function reindex_all_posts( int $batch_size = 100, bool $force_reindex = false ): int {
-		$args = array(
-			'post_type'      => array( 'post', 'page' ),
-			'post_status'    => 'publish',
-			'posts_per_page' => $batch_size,
-			'fields'         => 'ids',
-			'no_found_rows'  => true,
-		);
+		$total_count = 0;
+		$offset      = 0;
 
-		$query = new \WP_Query( $args );
-		$count = 0;
+		do {
+			$args = array(
+				'post_type'      => array( 'post', 'page' ),
+				'post_status'    => 'publish',
+				'posts_per_page' => $batch_size,
+				'offset'         => $offset,
+				'fields'         => 'ids',
+				'no_found_rows'  => false,
+			);
 
-		if ( $query->have_posts() ) {
-			$result = $this->index_posts( $query->posts, $force_reindex );
-			$count  = $result['success'];
-		}
+			$query = new \WP_Query( $args );
 
-		return $count;
+			if ( $query->have_posts() ) {
+				$result       = $this->index_posts( $query->posts, $force_reindex );
+				$total_count += $result['success'];
+				$offset      += $batch_size;
+			} else {
+				break;
+			}
+		} while ( $query->have_posts() );
+
+		return $total_count;
 	}
 
 	/**
