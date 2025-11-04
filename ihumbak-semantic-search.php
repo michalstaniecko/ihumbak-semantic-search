@@ -51,6 +51,19 @@ function init() {
 		$migrator = new Database\Migrator( $schema );
 		$migrator->migrate();
 	}
+
+	// Initialize admin settings.
+	if ( is_admin() ) {
+		$settings = new Admin\Settings();
+		$settings->register();
+	}
+
+	// Initialize post hooks for auto-indexing.
+	$post_hooks = new Indexing\PostHooks();
+	$post_hooks->register();
+
+	// Register background indexing action.
+	add_action( 'ihumbak_semantic_search_index_post', array( Indexing\PostHooks::class, 'background_index_post' ) );
 }
 
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );

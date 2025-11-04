@@ -25,8 +25,27 @@ This WordPress plugin enables semantic search capabilities by combining traditio
 
 1. Upload the plugin files to `/wp-content/plugins/ihumbak-semantic-search/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Configure your OpenAI API key in Settings > Semantic Search
+3. Configure your OpenAI API key in Settings > Semantic Search OR add it to wp-config.php:
+   ```php
+   define( 'IHUMBAK_SEMANTIC_SEARCH_OPENAI_KEY', 'your-api-key-here' );
+   ```
 4. Run the initial indexing
+
+## Configuration
+
+### OpenAI API Key
+
+You can configure the OpenAI API key in two ways:
+
+1. **Via wp-config.php (Recommended for production):**
+   ```php
+   define( 'IHUMBAK_SEMANTIC_SEARCH_OPENAI_KEY', 'sk-...' );
+   ```
+
+2. **Via Settings Page:**
+   Go to Settings > Semantic Search and enter your API key in the settings form.
+
+**Note:** If the constant is defined in wp-config.php, it will take precedence over the settings page option.
 
 ## Usage
 
