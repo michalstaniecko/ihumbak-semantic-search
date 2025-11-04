@@ -45,7 +45,12 @@ function init() {
 		dirname( plugin_basename( __FILE__ ) ) . '/languages'
 	);
 
-	// Initialize plugin components here in future phases.
+	// Check if database needs upgrade.
+	$schema = new Database\Schema();
+	if ( $schema->needs_upgrade() ) {
+		$migrator = new Database\Migrator( $schema );
+		$migrator->migrate();
+	}
 }
 
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
@@ -54,7 +59,11 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
  * Activation hook.
  */
 function activate() {
-	// Activation tasks will be added in future phases.
+	// Run database migrations.
+	$schema   = new Database\Schema();
+	$migrator = new Database\Migrator( $schema );
+	$migrator->migrate();
+
 	flush_rewrite_rules();
 }
 
@@ -68,3 +77,14 @@ function deactivate() {
 }
 
 register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\deactivate' );
+
+/**
+ * Uninstall hook - cleanup database.
+ */
+function uninstall() {
+	$schema   = new Database\Schema();
+	$migrator = new Database\Migrator( $schema );
+	$migrator->rollback();
+}
+
+register_uninstall_hook( __FILE__, __NAMESPACE__ . '\\uninstall' );
