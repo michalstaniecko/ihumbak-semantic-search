@@ -272,4 +272,13 @@ class EmbeddingsRepository {
 			$results
 		);
 	}
+
+	/**
+	 * Get embeddings table name
+	 *
+	 * @return string
+	 */
+	public function get_embeddings_table(): string {
+		return $this->schema->get_embeddings_table();
+	}
 }

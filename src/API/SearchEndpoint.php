@@ -163,23 +163,37 @@ class SearchEndpoint {
 			);
 		}
 
-		// Perform search based on mode.
-		if ( 'hybrid' === $mode ) {
-			$results = $this->search->search( $query, $args );
-		} else {
-			$results = $this->search->search_with_mode( $query, array_merge( $args, array( 'mode' => $mode ) ) );
+		try {
+			// Perform search based on mode.
+			if ( 'hybrid' === $mode ) {
+				$results = $this->search->search( $query, $args );
+			} else {
+				$results = $this->search->search_with_mode( $query, array_merge( $args, array( 'mode' => $mode ) ) );
+			}
+
+			// Ensure results is an array.
+			if ( ! is_array( $results ) ) {
+				$results = array();
+			}
+
+			// Cache results.
+			$this->cache->set_search_results( $query, $cache_key, $results );
+
+			return rest_ensure_response(
+				array(
+					'results' => $results,
+					'cached'  => false,
+					'count'   => count( $results ),
+				)
+			);
+		} catch ( \Exception $e ) {
+			error_log( 'Search error: ' . $e->getMessage() );
+			return new WP_Error(
+				'search_error',
+				__( 'An error occurred while searching. Please try again later.', 'ihumbak-semantic-search' ),
+				array( 'status' => 500 )
+			);
 		}
-
-		// Cache results.
-		$this->cache->set_search_results( $query, $cache_key, $results );
-
-		return rest_ensure_response(
-			array(
-				'results' => $results,
-				'cached'  => false,
-				'count'   => count( $results ),
-			)
-		);
 	}
 
 	/**
