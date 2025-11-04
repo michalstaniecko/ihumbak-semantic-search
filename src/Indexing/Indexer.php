@@ -229,10 +229,10 @@ class Indexer {
 		$total_posts = wp_count_posts( 'post' )->publish + wp_count_posts( 'page' )->publish;
 
 		return array(
-			'total_posts'       => $total_posts,
-			'indexed_posts'     => $this->repository->get_indexed_posts_count(),
-			'total_embeddings'  => $this->repository->get_total_embeddings_count(),
-			'posts_need_index'  => count( $this->repository->get_posts_needing_indexing( 1000 ) ),
+			'total_posts'      => $total_posts,
+			'indexed_posts'    => $this->repository->get_indexed_posts_count(),
+			'total_embeddings' => $this->repository->get_total_embeddings_count(),
+			'posts_need_index' => count( $this->repository->get_posts_needing_indexing( 1000 ) ),
 		);
 	}
 }

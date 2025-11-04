@@ -35,10 +35,10 @@ class SearchWidget extends WP_Widget {
 	 * @return void
 	 */
 	public function widget( $args, $instance ): void {
-		$title      = ! empty( $instance['title'] ) ? $instance['title'] : '';
-		$limit      = ! empty( $instance['limit'] ) ? absint( $instance['limit'] ) : 10;
-		$post_type  = ! empty( $instance['post_type'] ) ? $instance['post_type'] : 'post,page';
-		$mode       = ! empty( $instance['mode'] ) ? $instance['mode'] : 'hybrid';
+		$title     = ! empty( $instance['title'] ) ? $instance['title'] : '';
+		$limit     = ! empty( $instance['limit'] ) ? absint( $instance['limit'] ) : 10;
+		$post_type = ! empty( $instance['post_type'] ) ? $instance['post_type'] : 'post,page';
+		$mode      = ! empty( $instance['mode'] ) ? $instance['mode'] : 'hybrid';
 
 		echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
@@ -47,8 +47,10 @@ class SearchWidget extends WP_Widget {
 		}
 
 		// Use shortcode to render the search form.
+		// Values are already sanitized in update() method.
 		$shortcode = new Shortcode();
-		echo $shortcode->render_search_form( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $shortcode->render_search_form(
 			array(
 				'limit'     => $limit,
 				'post_type' => $post_type,
@@ -56,6 +58,7 @@ class SearchWidget extends WP_Widget {
 				'class'     => 'semantic-search-widget',
 			)
 		);
+		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		echo $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}

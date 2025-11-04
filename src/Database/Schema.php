@@ -31,7 +31,7 @@ class Schema {
 	 */
 	public function __construct() {
 		global $wpdb;
-		$this->wpdb              = $wpdb;
+		$this->wpdb             = $wpdb;
 		$this->embeddings_table = $wpdb->prefix . 'semantic_embeddings';
 	}
 

@@ -56,12 +56,12 @@ class HybridSearch {
 		}
 
 		$defaults = array(
-			'limit'            => 10,
-			'keyword_limit'    => 50,
-			'post_type'        => array( 'post', 'page' ),
-			'post_status'      => 'publish',
-			'semantic_weight'  => 0.7,
-			'keyword_weight'   => 0.3,
+			'limit'           => 10,
+			'keyword_limit'   => 50,
+			'post_type'       => array( 'post', 'page' ),
+			'post_status'     => 'publish',
+			'semantic_weight' => 0.7,
+			'keyword_weight'  => 0.3,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -215,16 +215,16 @@ class HybridSearch {
 				}
 
 				return array(
-					'post'            => array(
-						'ID'            => $post->ID,
-						'post_title'    => $post->post_title,
-						'post_type'     => $post->post_type,
-						'post_date'     => $post->post_date,
+					'post'      => array(
+						'ID'             => $post->ID,
+						'post_title'     => $post->post_title,
+						'post_type'      => $post->post_type,
+						'post_date'      => $post->post_date,
 						'featured_image' => $thumbnail_url,
 					),
-					'score'           => $result['score'] ?? $result['relevance'] ?? $result['similarity'] ?? 0,
-					'permalink'       => get_permalink( $post ),
-					'excerpt'         => get_the_excerpt( $post ),
+					'score'     => $result['score'] ?? $result['relevance'] ?? $result['similarity'] ?? 0,
+					'permalink' => get_permalink( $post ),
+					'excerpt'   => get_the_excerpt( $post ),
 				);
 			},
 			$results

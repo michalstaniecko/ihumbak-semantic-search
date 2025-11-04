@@ -51,27 +51,30 @@ class KeywordSearch {
 		$search_query = $this->sanitize_fulltext_query( $query );
 
 		// Build post type conditions.
-		$post_types = (array) $args['post_type'];
+		$post_types             = (array) $args['post_type'];
 		$post_type_placeholders = implode( ',', array_fill( 0, count( $post_types ), '%s' ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT ID, 
-					MATCH(post_title, post_content) AGAINST (%s IN NATURAL LANGUAGE MODE) as relevance
-				FROM {$this->wpdb->posts}
-				WHERE MATCH(post_title, post_content) AGAINST (%s IN NATURAL LANGUAGE MODE)
-					AND post_status = %s
-					AND post_type IN ($post_type_placeholders)
-				ORDER BY relevance DESC
-				LIMIT %d",
-				array_merge(
-					array( $search_query, $search_query, $args['post_status'] ),
-					$post_types,
-					array( $args['limit'] )
-				)
+		// Build the prepared SQL.
+		// phpcs:disable WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+		$sql = $this->wpdb->prepare(
+			"SELECT ID, 
+				MATCH(post_title, post_content) AGAINST (%s IN NATURAL LANGUAGE MODE) as relevance
+			FROM {$this->wpdb->posts}
+			WHERE MATCH(post_title, post_content) AGAINST (%s IN NATURAL LANGUAGE MODE)
+				AND post_status = %s
+				AND post_type IN ($post_type_placeholders)
+			ORDER BY relevance DESC
+			LIMIT %d",
+			array_merge(
+				array( $search_query, $search_query, $args['post_status'] ),
+				$post_types,
+				array( $args['limit'] )
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results = $this->wpdb->get_results( $sql );
 
 		if ( empty( $results ) ) {
 			return array();
@@ -110,27 +113,30 @@ class KeywordSearch {
 		$args = wp_parse_args( $args, $defaults );
 
 		// Build post type conditions.
-		$post_types = (array) $args['post_type'];
+		$post_types             = (array) $args['post_type'];
 		$post_type_placeholders = implode( ',', array_fill( 0, count( $post_types ), '%s' ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$results = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT ID, 
-					MATCH(post_title, post_content) AGAINST (%s IN BOOLEAN MODE) as relevance
-				FROM {$this->wpdb->posts}
-				WHERE MATCH(post_title, post_content) AGAINST (%s IN BOOLEAN MODE)
-					AND post_status = %s
-					AND post_type IN ($post_type_placeholders)
-				ORDER BY relevance DESC
-				LIMIT %d",
-				array_merge(
-					array( $query, $query, $args['post_status'] ),
-					$post_types,
-					array( $args['limit'] )
-				)
+		// Build the prepared SQL.
+		// phpcs:disable WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+		$sql = $this->wpdb->prepare(
+			"SELECT ID, 
+				MATCH(post_title, post_content) AGAINST (%s IN BOOLEAN MODE) as relevance
+			FROM {$this->wpdb->posts}
+			WHERE MATCH(post_title, post_content) AGAINST (%s IN BOOLEAN MODE)
+				AND post_status = %s
+				AND post_type IN ($post_type_placeholders)
+			ORDER BY relevance DESC
+			LIMIT %d",
+			array_merge(
+				array( $query, $query, $args['post_status'] ),
+				$post_types,
+				array( $args['limit'] )
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results = $this->wpdb->get_results( $sql );
 
 		if ( empty( $results ) ) {
 			return array();

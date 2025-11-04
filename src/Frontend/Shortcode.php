@@ -31,14 +31,14 @@ class Shortcode {
 	public function render_search_form( array $atts = array() ): string {
 		$atts = shortcode_atts(
 			array(
-				'placeholder'     => __( 'Enter your search query...', 'ihumbak-semantic-search' ),
-				'button_text'     => __( 'Search', 'ihumbak-semantic-search' ),
-				'limit'           => 10,
-				'post_type'       => 'post,page',
-				'show_excerpt'    => 'yes',
-				'show_thumbnail'  => 'no',
-				'mode'            => 'hybrid',
-				'class'           => '',
+				'placeholder'    => __( 'Enter your search query...', 'ihumbak-semantic-search' ),
+				'button_text'    => __( 'Search', 'ihumbak-semantic-search' ),
+				'limit'          => 10,
+				'post_type'      => 'post,page',
+				'show_excerpt'   => 'yes',
+				'show_thumbnail' => 'no',
+				'mode'           => 'hybrid',
+				'class'          => '',
 			),
 			$atts,
 			'semantic_search'
@@ -120,13 +120,13 @@ class Shortcode {
 			'semantic-search',
 			'semanticSearchConfig',
 			array(
-				'apiUrl'     => rest_url( 'semantic-search/v1/search' ),
-				'nonce'      => wp_create_nonce( 'wp_rest' ),
-				'i18n'       => array(
-					'noResults'     => __( 'No results found.', 'ihumbak-semantic-search' ),
-					'error'         => __( 'An error occurred. Please try again.', 'ihumbak-semantic-search' ),
-					'resultsFound'  => __( 'results found', 'ihumbak-semantic-search' ),
-					'cached'        => __( '(cached)', 'ihumbak-semantic-search' ),
+				'apiUrl' => rest_url( 'semantic-search/v1/search' ),
+				'nonce'  => wp_create_nonce( 'wp_rest' ),
+				'i18n'   => array(
+					'noResults'    => __( 'No results found.', 'ihumbak-semantic-search' ),
+					'error'        => __( 'An error occurred. Please try again.', 'ihumbak-semantic-search' ),
+					'resultsFound' => __( 'results found', 'ihumbak-semantic-search' ),
+					'cached'       => __( '(cached)', 'ihumbak-semantic-search' ),
 				),
 			)
 		);

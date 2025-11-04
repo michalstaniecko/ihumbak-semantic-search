@@ -70,13 +70,13 @@ class SearchEndpoint {
 				'callback'            => array( $this, 'handle_search' ),
 				'permission_callback' => '__return_true',
 				'args'                => array(
-					'q' => array(
+					'q'         => array(
 						'required'          => true,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 						'description'       => 'Search query',
 					),
-					'limit' => array(
+					'limit'     => array(
 						'required'          => false,
 						'type'              => 'integer',
 						'default'           => 10,
@@ -90,7 +90,7 @@ class SearchEndpoint {
 						'sanitize_callback' => 'sanitize_text_field',
 						'description'       => 'Comma-separated list of post types',
 					),
-					'mode' => array(
+					'mode'      => array(
 						'required'          => false,
 						'type'              => 'string',
 						'default'           => 'hybrid',
@@ -188,7 +188,8 @@ class SearchEndpoint {
 	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response
 	 */
-	public function handle_stats( WP_REST_Request $request ): WP_REST_Response {
+	public function handle_stats( WP_REST_Request $request ): WP_REST_Response { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+		// The $request parameter is kept for REST API callback signature compatibility.
 		$cache_stats = $this->cache->get_stats();
 
 		return rest_ensure_response(

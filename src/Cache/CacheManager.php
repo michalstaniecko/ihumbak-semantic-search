@@ -105,9 +105,10 @@ class CacheManager {
 	 * @param int $post_id Post ID.
 	 * @return void
 	 */
-	public function invalidate_post( int $post_id ): void {
+	public function invalidate_post( int $post_id ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		// Since we can't easily determine which cached queries include this post,
 		// we flush all search caches when a post is updated.
+		// The $post_id parameter is kept for API consistency and future use.
 		$this->flush_all();
 	}
 
@@ -171,9 +172,9 @@ class CacheManager {
 		// WordPress doesn't provide built-in cache stats,
 		// so we'll return basic configuration info.
 		return array(
-			'enabled'    => $this->enabled,
-			'ttl'        => $this->expiration,
-			'group'      => $this->cache_group,
+			'enabled' => $this->enabled,
+			'ttl'     => $this->expiration,
+			'group'   => $this->cache_group,
 		);
 	}
 }

@@ -144,7 +144,7 @@ class SemanticSearch {
 
 		$table = $this->repository->get_embeddings_table();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$results = $wpdb->get_col(
 			"SELECT DISTINCT post_id FROM {$table} WHERE field_type = 'post_content'"
 		);
