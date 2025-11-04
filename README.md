@@ -51,15 +51,44 @@ You can configure the OpenAI API key in two ways:
 
 ### Shortcode
 
+Add the search form to any post or page:
+
 ```
 [semantic_search]
 ```
+
+With custom attributes:
+
+```
+[semantic_search 
+    placeholder="Search..." 
+    limit="10" 
+    post_type="post,page" 
+    mode="hybrid"
+    show_excerpt="yes"
+    show_thumbnail="no"
+]
+```
+
+See [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) for complete shortcode documentation.
+
+### Widget
+
+1. Go to **Appearance > Widgets**
+2. Add the **Semantic Search** widget to your sidebar
+3. Configure the widget settings
 
 ### REST API
 
 ```
 GET /wp-json/semantic-search/v1/search?q=your+query
 ```
+
+Parameters:
+- `q` (required): Search query
+- `limit` (optional): Number of results, default 10
+- `post_type` (optional): Comma-separated post types, default "post,page"
+- `mode` (optional): "hybrid", "keyword", or "semantic", default "hybrid"
 
 ## Development
 

@@ -1,0 +1,303 @@
+/**
+ * Semantic Search Frontend Styles
+ */
+
+/* Search Wrapper */
+.semantic-search-wrapper {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+/* Search Form */
+.semantic-search-form {
+	margin-bottom: 20px;
+}
+
+.semantic-search-input-wrapper {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.semantic-search-input {
+	flex: 1;
+	padding: 12px 16px;
+	font-size: 16px;
+	border: 2px solid #ddd;
+	border-radius: 4px;
+	transition: border-color 0.3s ease;
+}
+
+.semantic-search-input:focus {
+	outline: none;
+	border-color: #0073aa;
+}
+
+.semantic-search-button {
+	padding: 12px 24px;
+	font-size: 16px;
+	font-weight: 600;
+	color: #fff;
+	background-color: #0073aa;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.semantic-search-button:hover {
+	background-color: #005177;
+}
+
+.semantic-search-button:disabled {
+	background-color: #ccc;
+	cursor: not-allowed;
+}
+
+/* Loading */
+.semantic-search-loading {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px;
+	color: #666;
+}
+
+.semantic-search-spinner {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border: 2px solid #f3f3f3;
+	border-top: 2px solid #0073aa;
+	border-radius: 50%;
+	animation: semantic-search-spin 1s linear infinite;
+}
+
+@keyframes semantic-search-spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+/* Results Header */
+.semantic-search-results-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px;
+	background-color: #f7f7f7;
+	border-radius: 4px;
+	margin-bottom: 15px;
+}
+
+.semantic-search-results-count {
+	font-weight: 600;
+	color: #333;
+}
+
+.semantic-search-clear {
+	padding: 6px 12px;
+	font-size: 14px;
+	color: #666;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.semantic-search-clear:hover {
+	color: #333;
+	border-color: #999;
+}
+
+/* Results List */
+.semantic-search-results-list {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+/* Single Result */
+.semantic-search-result {
+	display: flex;
+	gap: 15px;
+	padding: 15px;
+	background-color: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	transition: all 0.3s ease;
+}
+
+.semantic-search-result:hover {
+	border-color: #0073aa;
+	box-shadow: 0 2px 8px rgba(0, 115, 170, 0.1);
+}
+
+.semantic-search-result-thumbnail {
+	flex-shrink: 0;
+	width: 100px;
+	height: 100px;
+	overflow: hidden;
+	border-radius: 4px;
+}
+
+.semantic-search-result-thumbnail img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.semantic-search-result-content {
+	flex: 1;
+}
+
+.semantic-search-result-title {
+	margin: 0 0 10px 0;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.semantic-search-result-title a {
+	color: #0073aa;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.semantic-search-result-title a:hover {
+	color: #005177;
+	text-decoration: underline;
+}
+
+.semantic-search-result-excerpt {
+	margin: 0 0 10px 0;
+	color: #666;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.semantic-search-result-meta {
+	display: flex;
+	gap: 15px;
+	font-size: 13px;
+	color: #999;
+}
+
+.semantic-search-result-type {
+	text-transform: capitalize;
+}
+
+.semantic-search-result-score {
+	padding: 2px 8px;
+	background-color: #f0f0f0;
+	border-radius: 3px;
+	font-weight: 600;
+	color: #0073aa;
+}
+
+/* Error Message */
+.semantic-search-error {
+	padding: 15px;
+	color: #d63638;
+	background-color: #fcf0f1;
+	border: 1px solid #f1adad;
+	border-radius: 4px;
+	text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.semantic-search-wrapper {
+		padding: 15px;
+	}
+
+	.semantic-search-input-wrapper {
+		flex-direction: column;
+	}
+
+	.semantic-search-button {
+		width: 100%;
+	}
+
+	.semantic-search-results-header {
+		flex-direction: column;
+		gap: 10px;
+		text-align: center;
+	}
+
+	.semantic-search-clear {
+		width: 100%;
+	}
+
+	.semantic-search-result {
+		flex-direction: column;
+	}
+
+	.semantic-search-result-thumbnail {
+		width: 100%;
+		height: 200px;
+	}
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+	.semantic-search-wrapper {
+		color: #e0e0e0;
+	}
+
+	.semantic-search-input {
+		background-color: #2d2d2d;
+		border-color: #444;
+		color: #e0e0e0;
+	}
+
+	.semantic-search-input:focus {
+		border-color: #0096dd;
+	}
+
+	.semantic-search-button {
+		background-color: #0096dd;
+	}
+
+	.semantic-search-button:hover {
+		background-color: #0073aa;
+	}
+
+	.semantic-search-results-header {
+		background-color: #2d2d2d;
+		color: #e0e0e0;
+	}
+
+	.semantic-search-clear {
+		background-color: #2d2d2d;
+		border-color: #444;
+		color: #e0e0e0;
+	}
+
+	.semantic-search-result {
+		background-color: #2d2d2d;
+		border-color: #444;
+	}
+
+	.semantic-search-result:hover {
+		border-color: #0096dd;
+	}
+
+	.semantic-search-result-title a {
+		color: #0096dd;
+	}
+
+	.semantic-search-result-title a:hover {
+		color: #33b3ff;
+	}
+
+	.semantic-search-result-excerpt {
+		color: #b0b0b0;
+	}
+
+	.semantic-search-result-score {
+		background-color: #3d3d3d;
+		color: #0096dd;
+	}
+}

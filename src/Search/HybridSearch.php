@@ -201,7 +201,7 @@ class HybridSearch {
 	private function format_results( array $results, int $limit ): array {
 		$results = array_slice( $results, 0, $limit );
 
-		return array_map(
+		$formatted = array_map(
 			function ( $result ) {
 				$post = get_post( $result['post_id'] );
 
@@ -209,18 +209,29 @@ class HybridSearch {
 					return null;
 				}
 
+				$thumbnail_url = null;
+				if ( has_post_thumbnail( $post->ID ) ) {
+					$thumbnail_url = get_the_post_thumbnail_url( $post->ID, 'medium' );
+				}
+
 				return array(
-					'post'      => $post,
-					'score'     => $result['score'] ?? $result['relevance'] ?? $result['similarity'] ?? 0,
-					'permalink' => get_permalink( $post ),
-					'excerpt'   => get_the_excerpt( $post ),
+					'post'            => array(
+						'ID'            => $post->ID,
+						'post_title'    => $post->post_title,
+						'post_type'     => $post->post_type,
+						'post_date'     => $post->post_date,
+						'featured_image' => $thumbnail_url,
+					),
+					'score'           => $result['score'] ?? $result['relevance'] ?? $result['similarity'] ?? 0,
+					'permalink'       => get_permalink( $post ),
+					'excerpt'         => get_the_excerpt( $post ),
 				);
 			},
 			$results
 		);
 
 		// Filter out null values.
-		return array_values( array_filter( $results ) );
+		return array_values( array_filter( $formatted ) );
 	}
 
 	/**

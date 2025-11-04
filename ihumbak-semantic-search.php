@@ -69,12 +69,28 @@ function init() {
 	$search_endpoint = new API\SearchEndpoint();
 	$search_endpoint->register();
 
+	// Register shortcode.
+	$shortcode = new Frontend\Shortcode();
+	$shortcode->register();
+
+	// Register widget.
+	add_action( 'widgets_init', __NAMESPACE__ . '\\register_widgets' );
+
 	// Register cache invalidation hooks.
 	add_action( 'save_post', __NAMESPACE__ . '\\invalidate_cache_on_post_save' );
 	add_action( 'delete_post', __NAMESPACE__ . '\\invalidate_cache_on_post_delete' );
 }
 
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
+
+/**
+ * Register widgets
+ *
+ * @return void
+ */
+function register_widgets(): void {
+	register_widget( Frontend\SearchWidget::class );
+}
 
 /**
  * Activation hook.
