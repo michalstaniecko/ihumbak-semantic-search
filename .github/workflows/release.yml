@@ -35,10 +35,32 @@ jobs:
       - name: Build assets
         run: npm run build
       
+      - name: Prepare release directory
+        run: |
+          mkdir -p release/ihumbak-semantic-search
+          
+          # Copy core plugin files
+          cp ihumbak-semantic-search.php release/ihumbak-semantic-search/
+          cp -r src release/ihumbak-semantic-search/
+          cp -r build release/ihumbak-semantic-search/
+          cp -r languages release/ihumbak-semantic-search/ 2>/dev/null || true
+          
+          # Copy vendor dependencies (production only)
+          cp -r vendor release/ihumbak-semantic-search/
+          
+          # Copy readme if exists
+          cp readme.txt release/ihumbak-semantic-search/ 2>/dev/null || true
+          
+          # Create changelog if exists
+          cp CHANGELOG.md release/ihumbak-semantic-search/ 2>/dev/null || true
+      
       - name: Create plugin zip
         run: |
+          cd release
+          zip -r ../ihumbak-semantic-search.zip ihumbak-semantic-search
+          cd ..
           mkdir -p releases
-          zip -r releases/ihumbak-semantic-search.zip . -x@.distignore
+          mv ihumbak-semantic-search.zip releases/
       
       - name: Extract version from tag
         id: get_version
