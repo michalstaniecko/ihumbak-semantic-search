@@ -273,7 +273,24 @@ class HybridSearch {
 			)
 		);
 
-		return $this->format_results( $semantic_results, $args['limit'] );
+		$results = $this->format_results( $semantic_results, $args['limit'] );
+
+		// Fuzzy search fallback if no results.
+		if ( empty( $results ) && apply_filters( 'ihumbak_semantic_search_enable_fuzzy', true ) ) {
+			$fuzzy_ids = $this->get_fuzzy_search()->search( $query );
+			if ( ! empty( $fuzzy_ids ) ) {
+				foreach ( $fuzzy_ids as $post_id ) {
+					$results[] = array(
+						'post_id' => $post_id,
+						'score'   => 0.5,
+						'type'    => 'fuzzy',
+					);
+				}
+				$results = $this->format_results( $results, $args['limit'] );
+			}
+		}
+
+		return $results;
 	}
 
 	/**
