@@ -136,8 +136,7 @@ function invalidate_cache_on_post_save( int $post_id ): void {
 	$cache->invalidate_post( $post_id );
 
 	// Invalidate fuzzy search cache.
-	$fuzzy = new Search\FuzzySearch();
-	$fuzzy->invalidate_cache();
+	Search\FuzzySearch::invalidate_cache();
 }
 
 /**
@@ -150,6 +149,5 @@ function invalidate_cache_on_post_delete( int $post_id ): void {
 	$cache->invalidate_post( $post_id );
 
 	// Invalidate fuzzy search cache.
-	$fuzzy = new Search\FuzzySearch();
-	$fuzzy->invalidate_cache();
+	Search\FuzzySearch::invalidate_cache();
 }

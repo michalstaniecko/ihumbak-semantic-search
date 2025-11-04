@@ -36,6 +36,13 @@ class FuzzySearch {
 	private const CACHE_EXPIRATION = 3600; // 1 hour
 
 	/**
+	 * Maximum number of search words to use for candidate filtering
+	 *
+	 * @var int
+	 */
+	private const MAX_SEARCH_WORDS = 3;
+
+	/**
 	 * Constructor
 	 *
 	 * @param float $min_threshold  Minimum similarity threshold (default: 0.35).
@@ -119,7 +126,7 @@ class FuzzySearch {
 	 *
 	 * @return void
 	 */
-	public function invalidate_cache(): void {
+	public static function invalidate_cache(): void {
 		global $wpdb;
 
 		// Delete all fuzzy search transients.
@@ -288,7 +295,7 @@ class FuzzySearch {
 
 		// Use first few words for simple search to narrow candidates.
 		if ( ! empty( $words ) ) {
-			$args['s'] = implode( ' ', array_slice( $words, 0, 3 ) );
+			$args['s'] = implode( ' ', array_slice( $words, 0, self::MAX_SEARCH_WORDS ) );
 		}
 
 		$query = new WP_Query( $args );

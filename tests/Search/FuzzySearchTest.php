@@ -240,8 +240,8 @@ class FuzzySearchTest extends WP_UnitTestCase {
 		// Search to create cache.
 		$this->fuzzy->search( 'wordpress' );
 
-		// Should not throw errors.
-		$this->fuzzy->invalidate_cache();
+		// Should not throw errors when called statically.
+		FuzzySearch::invalidate_cache();
 		$this->assertTrue( true );
 	}
 
