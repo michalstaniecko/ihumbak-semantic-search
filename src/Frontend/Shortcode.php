@@ -101,18 +101,25 @@ class Shortcode {
 			return;
 		}
 
+		// Load asset file for dependencies and version.
+		$asset_file = IHUMBAK_SEMANTIC_SEARCH_PLUGIN_DIR . 'build/semantic-search.asset.php';
+		$asset_data = file_exists( $asset_file ) ? require $asset_file : array(
+			'dependencies' => array( 'jquery' ),
+			'version'      => IHUMBAK_SEMANTIC_SEARCH_VERSION,
+		);
+
 		wp_enqueue_style(
 			'semantic-search',
-			IHUMBAK_SEMANTIC_SEARCH_PLUGIN_URL . 'assets/css/semantic-search.css',
+			IHUMBAK_SEMANTIC_SEARCH_PLUGIN_URL . 'build/semantic-search.css',
 			array(),
-			IHUMBAK_SEMANTIC_SEARCH_VERSION
+			$asset_data['version']
 		);
 
 		wp_enqueue_script(
 			'semantic-search',
-			IHUMBAK_SEMANTIC_SEARCH_PLUGIN_URL . 'assets/js/semantic-search.js',
-			array( 'jquery' ),
-			IHUMBAK_SEMANTIC_SEARCH_VERSION,
+			IHUMBAK_SEMANTIC_SEARCH_PLUGIN_URL . 'build/semantic-search.js',
+			$asset_data['dependencies'],
+			$asset_data['version'],
 			true
 		);
 
