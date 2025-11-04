@@ -104,9 +104,14 @@ class Shortcode {
 		// Load asset file for dependencies and version.
 		$asset_file = IHUMBAK_SEMANTIC_SEARCH_PLUGIN_DIR . 'build/semantic-search.asset.php';
 		$asset_data = file_exists( $asset_file ) ? require $asset_file : array(
-			'dependencies' => array( 'jquery' ),
+			'dependencies' => array(),
 			'version'      => IHUMBAK_SEMANTIC_SEARCH_VERSION,
 		);
+
+		// Ensure jQuery is always included as a dependency.
+		if ( ! in_array( 'jquery', $asset_data['dependencies'], true ) ) {
+			$asset_data['dependencies'][] = 'jquery';
+		}
 
 		wp_enqueue_style(
 			'semantic-search',
