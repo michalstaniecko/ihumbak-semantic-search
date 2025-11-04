@@ -1,130 +1,140 @@
 /**
  * Semantic Search Frontend JavaScript
+ *
+ * @param {Object} $ jQuery object
  */
-(function($) {
+/* global semanticSearchConfig, jQuery */
+( function ( $ ) {
 	'use strict';
 
 	class SemanticSearch {
-		constructor(wrapper) {
-			this.$wrapper = $(wrapper);
-			this.$form = this.$wrapper.find('.semantic-search-form');
-			this.$input = this.$wrapper.find('.semantic-search-input');
-			this.$button = this.$wrapper.find('.semantic-search-button');
-			this.$loading = this.$wrapper.find('.semantic-search-loading');
-			this.$results = this.$wrapper.find('.semantic-search-results');
-			this.$resultsList = this.$wrapper.find('.semantic-search-results-list');
-			this.$resultsCount = this.$wrapper.find('.semantic-search-results-count');
-			this.$clearButton = this.$wrapper.find('.semantic-search-clear');
-			this.$error = this.$wrapper.find('.semantic-search-error');
+		constructor( wrapper ) {
+			this.$wrapper = $( wrapper );
+			this.$form = this.$wrapper.find( '.semantic-search-form' );
+			this.$input = this.$wrapper.find( '.semantic-search-input' );
+			this.$button = this.$wrapper.find( '.semantic-search-button' );
+			this.$loading = this.$wrapper.find( '.semantic-search-loading' );
+			this.$results = this.$wrapper.find( '.semantic-search-results' );
+			this.$resultsList = this.$wrapper.find(
+				'.semantic-search-results-list'
+			);
+			this.$resultsCount = this.$wrapper.find(
+				'.semantic-search-results-count'
+			);
+			this.$clearButton = this.$wrapper.find( '.semantic-search-clear' );
+			this.$error = this.$wrapper.find( '.semantic-search-error' );
 
 			this.config = {
-				limit: this.$wrapper.data('limit') || 10,
-				postType: this.$wrapper.data('post-type') || 'post,page',
-				showExcerpt: this.$wrapper.data('show-excerpt') === 'yes',
-				showThumbnail: this.$wrapper.data('show-thumbnail') === 'yes',
-				mode: this.$wrapper.data('mode') || 'hybrid'
+				limit: this.$wrapper.data( 'limit' ) || 10,
+				postType: this.$wrapper.data( 'post-type' ) || 'post,page',
+				showExcerpt: this.$wrapper.data( 'show-excerpt' ) === 'yes',
+				showThumbnail: this.$wrapper.data( 'show-thumbnail' ) === 'yes',
+				mode: this.$wrapper.data( 'mode' ) || 'hybrid',
 			};
 
 			this.init();
 		}
 
 		init() {
-			this.$form.on('submit', (e) => this.handleSubmit(e));
-			this.$clearButton.on('click', () => this.clearResults());
-			this.$input.on('keyup', (e) => this.handleKeyup(e));
+			this.$form.on( 'submit', ( e ) => this.handleSubmit( e ) );
+			this.$clearButton.on( 'click', () => this.clearResults() );
+			this.$input.on( 'keyup', ( e ) => this.handleKeyup( e ) );
 		}
 
-		handleSubmit(e) {
+		handleSubmit( e ) {
 			e.preventDefault();
 			const query = this.$input.val().trim();
 
-			if (!query) {
+			if ( ! query ) {
 				return;
 			}
 
-			this.performSearch(query);
+			this.performSearch( query );
 		}
 
-		handleKeyup(e) {
+		handleKeyup( e ) {
 			// Clear results on Escape
-			if (e.keyCode === 27) {
+			if ( e.keyCode === 27 ) {
 				this.clearResults();
 			}
 		}
 
-		async performSearch(query) {
+		async performSearch( query ) {
 			this.showLoading();
 			this.hideError();
 
-			const params = new URLSearchParams({
+			const params = new URLSearchParams( {
 				q: query,
 				limit: this.config.limit,
 				post_type: this.config.postType,
-				mode: this.config.mode
-			});
+				mode: this.config.mode,
+			} );
 
 			try {
 				const response = await fetch(
-					`${semanticSearchConfig.apiUrl}?${params}`,
+					`${ semanticSearchConfig.apiUrl }?${ params }`,
 					{
 						headers: {
-							'X-WP-Nonce': semanticSearchConfig.nonce
-						}
+							'X-WP-Nonce': semanticSearchConfig.nonce,
+						},
 					}
 				);
 
-				if (!response.ok) {
-					throw new Error('Search request failed');
+				if ( ! response.ok ) {
+					throw new Error( 'Search request failed' );
 				}
 
 				const data = await response.json();
-				this.displayResults(data, query);
-			} catch (error) {
-				console.error('Search error:', error);
-				this.showError(semanticSearchConfig.i18n.error);
+				this.displayResults( data );
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.error( 'Search error:', error );
+				this.showError( semanticSearchConfig.i18n.error );
 			} finally {
 				this.hideLoading();
 			}
 		}
 
-		displayResults(data, query) {
+		displayResults( data ) {
 			const { results, count, cached } = data;
 
-			if (count === 0) {
-				this.showError(semanticSearchConfig.i18n.noResults);
+			if ( count === 0 ) {
+				this.showError( semanticSearchConfig.i18n.noResults );
 				return;
 			}
 
 			// Update count
-			let countText = `${count} ${semanticSearchConfig.i18n.resultsFound}`;
-			if (cached) {
-				countText += ` ${semanticSearchConfig.i18n.cached}`;
+			let countText = `${ count } ${ semanticSearchConfig.i18n.resultsFound }`;
+			if ( cached ) {
+				countText += ` ${ semanticSearchConfig.i18n.cached }`;
 			}
-			this.$resultsCount.text(countText);
+			this.$resultsCount.text( countText );
 
 			// Clear previous results
 			this.$resultsList.empty();
 
 			// Render results
-			results.forEach((result) => {
-				this.$resultsList.append(this.renderResult(result));
-			});
+			results.forEach( ( result ) => {
+				this.$resultsList.append( this.renderResult( result ) );
+			} );
 
 			// Show results
 			this.$results.show();
 		}
 
-		renderResult(result) {
+		renderResult( result ) {
 			const { post, score, permalink, excerpt } = result;
-			const scorePercent = Math.round(score * 100);
+			const scorePercent = Math.round( score * 100 );
 
 			let html = '<div class="semantic-search-result">';
 
 			// Thumbnail
-			if (this.config.showThumbnail && post.featured_image) {
+			if ( this.config.showThumbnail && post.featured_image ) {
 				html += `
 					<div class="semantic-search-result-thumbnail">
-						<img src="${post.featured_image}" alt="${this.escapeHtml(post.post_title)}" />
+						<img src="${ post.featured_image }" alt="${ this.escapeHtml(
+							post.post_title
+						) }" />
 					</div>
 				`;
 			}
@@ -134,15 +144,15 @@
 			// Title
 			html += `
 				<h3 class="semantic-search-result-title">
-					<a href="${permalink}">${this.escapeHtml(post.post_title)}</a>
+					<a href="${ permalink }">${ this.escapeHtml( post.post_title ) }</a>
 				</h3>
 			`;
 
 			// Excerpt
-			if (this.config.showExcerpt && excerpt) {
+			if ( this.config.showExcerpt && excerpt ) {
 				html += `
 					<div class="semantic-search-result-excerpt">
-						${this.escapeHtml(excerpt)}
+						${ this.escapeHtml( excerpt ) }
 					</div>
 				`;
 			}
@@ -150,8 +160,8 @@
 			// Meta
 			html += `
 				<div class="semantic-search-result-meta">
-					<span class="semantic-search-result-type">${post.post_type}</span>
-					<span class="semantic-search-result-score" title="Relevance Score">${scorePercent}%</span>
+					<span class="semantic-search-result-type">${ post.post_type }</span>
+					<span class="semantic-search-result-score" title="Relevance Score">${ scorePercent }%</span>
 				</div>
 			`;
 
@@ -163,17 +173,17 @@
 
 		showLoading() {
 			this.$loading.show();
-			this.$button.prop('disabled', true);
+			this.$button.prop( 'disabled', true );
 			this.$results.hide();
 		}
 
 		hideLoading() {
 			this.$loading.hide();
-			this.$button.prop('disabled', false);
+			this.$button.prop( 'disabled', false );
 		}
 
-		showError(message) {
-			this.$error.text(message).show();
+		showError( message ) {
+			this.$error.text( message ).show();
 			this.$results.hide();
 		}
 
@@ -182,24 +192,23 @@
 		}
 
 		clearResults() {
-			this.$input.val('');
+			this.$input.val( '' );
 			this.$results.hide();
 			this.$resultsList.empty();
 			this.hideError();
 		}
 
-		escapeHtml(text) {
-			const div = document.createElement('div');
+		escapeHtml( text ) {
+			const div = document.createElement( 'div' );
 			div.textContent = text;
 			return div.innerHTML;
 		}
 	}
 
 	// Initialize on document ready
-	$(document).ready(function() {
-		$('.semantic-search-wrapper').each(function() {
-			new SemanticSearch(this);
-		});
-	});
-
-})(jQuery);
+	$( document ).ready( function () {
+		$( '.semantic-search-wrapper' ).each( function () {
+			new SemanticSearch( this );
+		} );
+	} );
+} )( jQuery );

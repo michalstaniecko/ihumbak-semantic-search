@@ -75,8 +75,14 @@
 }
 
 @keyframes semantic-search-spin {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
+
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 /* Results Header */
@@ -208,6 +214,7 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+
 	.semantic-search-wrapper {
 		padding: 15px;
 	}
@@ -242,6 +249,7 @@
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
+
 	.semantic-search-wrapper {
 		color: #e0e0e0;
 	}
