@@ -64,6 +64,14 @@ function init() {
 
 	// Register background indexing action.
 	add_action( 'ihumbak_semantic_search_index_post', array( Indexing\PostHooks::class, 'background_index_post' ) );
+
+	// Register REST API endpoints.
+	$search_endpoint = new API\SearchEndpoint();
+	$search_endpoint->register();
+
+	// Register cache invalidation hooks.
+	add_action( 'save_post', __NAMESPACE__ . '\\invalidate_cache_on_post_save' );
+	add_action( 'delete_post', __NAMESPACE__ . '\\invalidate_cache_on_post_delete' );
 }
 
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\init' );
@@ -101,3 +109,23 @@ function uninstall() {
 }
 
 register_uninstall_hook( __FILE__, __NAMESPACE__ . '\\uninstall' );
+
+/**
+ * Invalidate cache on post save
+ *
+ * @param int $post_id Post ID.
+ */
+function invalidate_cache_on_post_save( int $post_id ): void {
+	$cache = new Cache\CacheManager();
+	$cache->invalidate_post( $post_id );
+}
+
+/**
+ * Invalidate cache on post delete
+ *
+ * @param int $post_id Post ID.
+ */
+function invalidate_cache_on_post_delete( int $post_id ): void {
+	$cache = new Cache\CacheManager();
+	$cache->invalidate_post( $post_id );
+}

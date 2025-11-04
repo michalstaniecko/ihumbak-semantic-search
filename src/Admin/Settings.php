@@ -79,6 +79,35 @@ class Settings {
 			)
 		);
 
+		register_setting(
+			'ihumbak_semantic_search',
+			'ihumbak_semantic_search_mode',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+				'default'           => 'hybrid',
+			)
+		);
+
+		register_setting(
+			'ihumbak_semantic_search',
+			'ihumbak_semantic_search_cache_enabled',
+			array(
+				'type'    => 'boolean',
+				'default' => true,
+			)
+		);
+
+		register_setting(
+			'ihumbak_semantic_search',
+			'ihumbak_semantic_search_cache_ttl',
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+				'default'           => 3600,
+			)
+		);
+
 		add_settings_section(
 			'ihumbak_semantic_search_api',
 			__( 'API Configuration', 'ihumbak-semantic-search' ),
@@ -87,9 +116,23 @@ class Settings {
 		);
 
 		add_settings_section(
+			'ihumbak_semantic_search_search',
+			__( 'Search Settings', 'ihumbak-semantic-search' ),
+			array( $this, 'render_search_section' ),
+			'ihumbak-semantic-search'
+		);
+
+		add_settings_section(
 			'ihumbak_semantic_search_indexing',
 			__( 'Indexing Settings', 'ihumbak-semantic-search' ),
 			array( $this, 'render_indexing_section' ),
+			'ihumbak-semantic-search'
+		);
+
+		add_settings_section(
+			'ihumbak_semantic_search_cache',
+			__( 'Cache Settings', 'ihumbak-semantic-search' ),
+			array( $this, 'render_cache_section' ),
 			'ihumbak-semantic-search'
 		);
 
@@ -113,11 +156,35 @@ class Settings {
 		);
 
 		add_settings_field(
+			'ihumbak_semantic_search_mode',
+			__( 'Search Mode', 'ihumbak-semantic-search' ),
+			array( $this, 'render_search_mode_field' ),
+			'ihumbak-semantic-search',
+			'ihumbak_semantic_search_search'
+		);
+
+		add_settings_field(
 			'ihumbak_semantic_search_auto_index',
 			__( 'Auto-index on Save', 'ihumbak-semantic-search' ),
 			array( $this, 'render_auto_index_field' ),
 			'ihumbak-semantic-search',
 			'ihumbak_semantic_search_indexing'
+		);
+
+		add_settings_field(
+			'ihumbak_semantic_search_cache_enabled',
+			__( 'Enable Cache', 'ihumbak-semantic-search' ),
+			array( $this, 'render_cache_enabled_field' ),
+			'ihumbak-semantic-search',
+			'ihumbak_semantic_search_cache'
+		);
+
+		add_settings_field(
+			'ihumbak_semantic_search_cache_ttl',
+			__( 'Cache TTL (seconds)', 'ihumbak-semantic-search' ),
+			array( $this, 'render_cache_ttl_field' ),
+			'ihumbak-semantic-search',
+			'ihumbak_semantic_search_cache'
 		);
 	}
 
@@ -150,6 +217,24 @@ class Settings {
 		echo '<tr><th>' . esc_html__( 'Total Embeddings', 'ihumbak-semantic-search' ) . '</th><td>' . esc_html( $stats['total_embeddings'] ) . '</td></tr>';
 		echo '<tr><th>' . esc_html__( 'Posts Needing Index', 'ihumbak-semantic-search' ) . '</th><td>' . esc_html( $stats['posts_need_index'] ) . '</td></tr>';
 		echo '</table>';
+	}
+
+	/**
+	 * Render search section
+	 *
+	 * @return void
+	 */
+	public function render_search_section(): void {
+		echo '<p>' . esc_html__( 'Configure how search results are generated.', 'ihumbak-semantic-search' ) . '</p>';
+	}
+
+	/**
+	 * Render cache section
+	 *
+	 * @return void
+	 */
+	public function render_cache_section(): void {
+		echo '<p>' . esc_html__( 'Cache settings to improve search performance.', 'ihumbak-semantic-search' ) . '</p>';
 	}
 
 	/**
@@ -194,6 +279,51 @@ class Settings {
 		echo '<input type="checkbox" name="ihumbak_semantic_search_auto_index" value="1" ' . checked( $value, true, false ) . ' />';
 		echo ' ' . esc_html__( 'Automatically index posts when they are saved or published', 'ihumbak-semantic-search' );
 		echo '</label>';
+	}
+
+	/**
+	 * Render search mode field
+	 *
+	 * @return void
+	 */
+	public function render_search_mode_field(): void {
+		$value = get_option( 'ihumbak_semantic_search_mode', 'hybrid' );
+		$modes = array(
+			'hybrid'   => __( 'Hybrid (Keyword + Semantic)', 'ihumbak-semantic-search' ),
+			'keyword'  => __( 'Keyword Only', 'ihumbak-semantic-search' ),
+			'semantic' => __( 'Semantic Only', 'ihumbak-semantic-search' ),
+		);
+
+		echo '<select name="ihumbak_semantic_search_mode">';
+		foreach ( $modes as $key => $label ) {
+			echo '<option value="' . esc_attr( $key ) . '" ' . selected( $value, $key, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'Hybrid mode combines keyword search with semantic reranking for best results.', 'ihumbak-semantic-search' ) . '</p>';
+	}
+
+	/**
+	 * Render cache enabled field
+	 *
+	 * @return void
+	 */
+	public function render_cache_enabled_field(): void {
+		$value = get_option( 'ihumbak_semantic_search_cache_enabled', true );
+		echo '<label>';
+		echo '<input type="checkbox" name="ihumbak_semantic_search_cache_enabled" value="1" ' . checked( $value, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Enable caching of search results', 'ihumbak-semantic-search' );
+		echo '</label>';
+	}
+
+	/**
+	 * Render cache TTL field
+	 *
+	 * @return void
+	 */
+	public function render_cache_ttl_field(): void {
+		$value = get_option( 'ihumbak_semantic_search_cache_ttl', 3600 );
+		echo '<input type="number" name="ihumbak_semantic_search_cache_ttl" value="' . esc_attr( $value ) . '" min="60" step="60" class="small-text" />';
+		echo '<p class="description">' . esc_html__( 'How long to cache search results (in seconds). Default: 3600 (1 hour)', 'ihumbak-semantic-search' ) . '</p>';
 	}
 
 	/**
