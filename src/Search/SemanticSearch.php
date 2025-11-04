@@ -151,14 +151,4 @@ class SemanticSearch {
 
 		return array_map( 'intval', $results );
 	}
-
-	/**
-	 * Get embeddings table name
-	 *
-	 * @return string
-	 */
-	private function get_embeddings_table(): string {
-		global $wpdb;
-		return $wpdb->prefix . 'semantic_embeddings';
-	}
 }

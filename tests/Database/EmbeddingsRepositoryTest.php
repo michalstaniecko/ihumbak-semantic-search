@@ -208,4 +208,13 @@ class EmbeddingsRepositoryTest extends WP_UnitTestCase {
 		$needs_indexing = $this->repository->get_posts_needing_indexing();
 		$this->assertContains( $post2, $needs_indexing );
 	}
+
+	/**
+	 * Test getting embeddings table name
+	 */
+	public function test_get_embeddings_table() {
+		global $wpdb;
+		$expected_table = $wpdb->prefix . 'semantic_embeddings';
+		$this->assertEquals( $expected_table, $this->repository->get_embeddings_table() );
+	}
 }
