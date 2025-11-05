@@ -13,5 +13,10 @@ module.exports = {
 			'src-webpack',
 			'index.js'
 		),
+		'admin-reindex': path.resolve(
+			process.cwd(),
+			'src-webpack',
+			'admin-reindex.js'
+		),
 	},
 };
