@@ -254,7 +254,9 @@
 		 * @param {Error} error Error object
 		 */
 		handleError( error ) {
-			console.error( 'Reindex error:', error );
+			if ( window.console && window.console.error ) {
+				window.console.error( 'Reindex error:', error );
+			}
 
 			this.isRunning = false;
 			this.elements.button.disabled = false;

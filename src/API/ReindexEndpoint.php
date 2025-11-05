@@ -94,8 +94,7 @@ class ReindexEndpoint {
 	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response
 	 */
-	public function get_reindex_status( WP_REST_Request $request ): WP_REST_Response { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-		// The $request parameter is kept for REST API callback signature compatibility.
+	public function get_reindex_status( WP_REST_Request $request ): WP_REST_Response {
 		$args = array(
 			'post_type'      => array( 'post', 'page' ),
 			'post_status'    => 'publish',
