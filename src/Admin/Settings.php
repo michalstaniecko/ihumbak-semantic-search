@@ -27,6 +27,7 @@ class Settings {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_post_ihumbak_semantic_search_reindex', array( $this, 'handle_reindex' ) );
 		add_action( 'admin_post_ihumbak_semantic_search_test_connection', array( $this, 'handle_test_connection' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 	}
 
 	/**
@@ -327,6 +328,56 @@ class Settings {
 	}
 
 	/**
+	 * Enqueue admin assets
+	 *
+	 * @param string $hook Current admin page hook.
+	 * @return void
+	 */
+	public function enqueue_admin_assets( string $hook ): void {
+		// Only load on our settings page.
+		if ( 'settings_page_ihumbak-semantic-search' !== $hook ) {
+			return;
+		}
+
+		// Enqueue CSS.
+		wp_enqueue_style(
+			'semantic-search-admin',
+			IHUMBAK_SEMANTIC_SEARCH_PLUGIN_URL . 'assets/css/admin-reindex.css',
+			array(),
+			IHUMBAK_SEMANTIC_SEARCH_VERSION
+		);
+
+		// Enqueue JavaScript.
+		wp_enqueue_script(
+			'semantic-search-admin',
+			IHUMBAK_SEMANTIC_SEARCH_PLUGIN_URL . 'assets/js/admin-reindex.js',
+			array(),
+			IHUMBAK_SEMANTIC_SEARCH_VERSION,
+			true
+		);
+
+		// Localize script with data.
+		wp_localize_script(
+			'semantic-search-admin',
+			'semanticSearchAdmin',
+			array(
+				'apiUrl' => rest_url( 'semantic-search/v1' ),
+				'nonce'  => wp_create_nonce( 'wp_rest' ),
+				'i18n'   => array(
+					'confirmReindex' => __( 'This will reindex all published posts. This may take a while. Continue?', 'ihumbak-semantic-search' ),
+					'reindexButton'  => __( 'Reindex All Posts', 'ihumbak-semantic-search' ),
+					'reindexing'     => __( 'Reindexing...', 'ihumbak-semantic-search' ),
+					'processing'     => __( 'Processing {processed} of {total} posts...', 'ihumbak-semantic-search' ),
+					'completed'      => __( 'Reindexing completed! Successfully indexed {indexed} posts. {failed} failed.', 'ihumbak-semantic-search' ),
+					'cancelled'      => __( 'Reindexing cancelled.', 'ihumbak-semantic-search' ),
+					'error'          => __( 'An error occurred during reindexing. Please try again.', 'ihumbak-semantic-search' ),
+					'failedCount'    => __( '{failed} posts failed to index.', 'ihumbak-semantic-search' ),
+				),
+			)
+		);
+	}
+
+	/**
 	 * Render settings page
 	 *
 	 * @return void
@@ -377,11 +428,28 @@ class Settings {
 
 			<br>
 
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" onsubmit="return confirm('<?php echo esc_js( __( 'This will reindex all published posts. This may take a while. Continue?', 'ihumbak-semantic-search' ) ); ?>');">
-				<input type="hidden" name="action" value="ihumbak_semantic_search_reindex">
-				<?php wp_nonce_field( 'ihumbak_semantic_search_reindex' ); ?>
-				<?php submit_button( __( 'Reindex All Posts', 'ihumbak-semantic-search' ), 'primary', 'submit', false ); ?>
-			</form>
+			<div class="reindex-section">
+				<button type="button" id="reindex-button" class="button button-primary">
+					<?php esc_html_e( 'Reindex All Posts', 'ihumbak-semantic-search' ); ?>
+				</button>
+
+				<div id="reindex-progress" style="display: none;">
+					<h3><?php esc_html_e( 'Reindex Progress', 'ihumbak-semantic-search' ); ?></h3>
+					<div class="reindex-progress-wrapper">
+						<div id="reindex-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+							0%
+						</div>
+					</div>
+					<div id="reindex-progress-text"></div>
+					<div class="reindex-actions">
+						<button type="button" id="reindex-cancel" class="button">
+							<?php esc_html_e( 'Cancel', 'ihumbak-semantic-search' ); ?>
+						</button>
+					</div>
+				</div>
+
+				<div id="reindex-status" style="display: none;"></div>
+			</div>
 		</div>
 		<?php
 	}

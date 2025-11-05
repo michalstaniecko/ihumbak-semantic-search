@@ -12,7 +12,8 @@ This WordPress plugin enables semantic search capabilities by combining traditio
 - **OpenAI Integration**: Uses OpenAI embeddings for semantic understanding
 - **ACF Support**: Searches through Advanced Custom Fields
 - **REST API**: Provides endpoints for AJAX-based search
-- **Admin Panel**: Easy configuration and reindexing tools
+- **Admin Panel**: Easy configuration and batch reindexing tools
+- **Batch Processing**: AJAX-based reindexing prevents server timeouts with large post counts
 
 ## Requirements
 
@@ -89,6 +90,17 @@ Parameters:
 - `limit` (optional): Number of results, default 10
 - `post_type` (optional): Comma-separated post types, default "post,page"
 - `mode` (optional): "hybrid", "keyword", or "semantic", default "hybrid"
+
+### Reindexing Posts
+
+The plugin provides an AJAX-based batch reindexing feature to handle large numbers of posts without server timeouts:
+
+1. Go to **Settings > Semantic Search**
+2. Click the **Reindex All Posts** button
+3. The reindexing process will run in batches, showing a progress bar
+4. You can cancel the process at any time
+
+The reindexing processes posts in batches of 10 by default, with each batch completing before the next one starts. This prevents server timeouts and provides real-time progress updates.
 
 ## Development
 

@@ -69,6 +69,9 @@ function init() {
 	$search_endpoint = new API\SearchEndpoint();
 	$search_endpoint->register();
 
+	$reindex_endpoint = new API\ReindexEndpoint();
+	$reindex_endpoint->register();
+
 	// Register shortcode.
 	$shortcode = new Frontend\Shortcode();
 	$shortcode->register();
