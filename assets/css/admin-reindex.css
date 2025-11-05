@@ -1,0 +1,128 @@
+/**
+ * Admin Reindex Styles
+ */
+
+/* Progress Container */
+#reindex-progress {
+	margin-top: 20px;
+	padding: 20px;
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 4px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+#reindex-progress h3 {
+	margin-top: 0;
+	margin-bottom: 15px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+/* Progress Bar */
+.reindex-progress-wrapper {
+	position: relative;
+	height: 30px;
+	background: #f0f0f1;
+	border: 1px solid #ccd0d4;
+	border-radius: 4px;
+	overflow: hidden;
+	margin-bottom: 10px;
+}
+
+#reindex-progress-bar {
+	height: 100%;
+	background: linear-gradient(90deg, #0073aa 0%, #005177 100%);
+	color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 600;
+	font-size: 12px;
+	transition: width 0.3s ease;
+	min-width: 0;
+}
+
+#reindex-progress-text {
+	margin: 10px 0;
+	font-size: 13px;
+	color: #646970;
+}
+
+/* Status Messages */
+#reindex-status {
+	margin-top: 15px;
+	padding: 10px 15px;
+	border-left: 4px solid;
+}
+
+#reindex-status.notice-success {
+	background: #ecf7ed;
+	border-left-color: #46b450;
+	color: #1e4620;
+}
+
+#reindex-status.notice-warning {
+	background: #fcf9e8;
+	border-left-color: #f0b849;
+	color: #5d4e00;
+}
+
+#reindex-status.notice-error {
+	background: #fcf0f1;
+	border-left-color: #d63638;
+	color: #3c1618;
+}
+
+/* Buttons */
+.reindex-actions {
+	display: flex;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+#reindex-cancel {
+	background: #f6f7f7;
+	border-color: #dcdcde;
+	color: #2c3338;
+}
+
+#reindex-cancel:hover {
+	background: #f0f0f1;
+	border-color: #8c8f94;
+	color: #1d2327;
+}
+
+/* Button States */
+#reindex-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+/* Animation for progress bar */
+@keyframes progress-pulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.8;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.reindex-progress-wrapper.processing #reindex-progress-bar {
+	animation: progress-pulse 1.5s ease-in-out infinite;
+}
+
+/* Responsive */
+@media (max-width: 782px) {
+	.reindex-actions {
+		flex-direction: column;
+	}
+	
+	.reindex-actions button {
+		width: 100%;
+	}
+}
