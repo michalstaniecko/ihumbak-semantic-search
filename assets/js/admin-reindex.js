@@ -103,7 +103,7 @@
 					this.totalIndexed += result.success;
 					this.totalFailed += result.failed;
 
-					const processed = this.currentOffset + result.processed;
+					const processed = this.totalIndexed + this.totalFailed;
 					this.updateProgress( processed, this.totalPosts );
 
 					if ( ! result.has_more ) {

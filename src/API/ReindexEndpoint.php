@@ -164,8 +164,8 @@ class ReindexEndpoint {
 		try {
 			$result = $indexer->index_posts( $query->posts, $force_reindex );
 
-			$has_more    = count( $query->posts ) === $batch_size;
-			$next_offset = $offset + $batch_size;
+			$next_offset = $offset + count( $query->posts );
+			$has_more    = $next_offset < $query->found_posts;
 
 			return rest_ensure_response(
 				array(
