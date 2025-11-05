@@ -342,7 +342,7 @@ class Settings {
 		// Enqueue CSS.
 		wp_enqueue_style(
 			'semantic-search-admin',
-			IHUMBAK_SEMANTIC_SEARCH_PLUGIN_URL . 'assets/css/admin-reindex.css',
+			IHUMBAK_SEMANTIC_SEARCH_PLUGIN_URL . 'build/admin-reindex.css',
 			array(),
 			IHUMBAK_SEMANTIC_SEARCH_VERSION
 		);
@@ -350,7 +350,7 @@ class Settings {
 		// Enqueue JavaScript.
 		wp_enqueue_script(
 			'semantic-search-admin',
-			IHUMBAK_SEMANTIC_SEARCH_PLUGIN_URL . 'assets/js/admin-reindex.js',
+			IHUMBAK_SEMANTIC_SEARCH_PLUGIN_URL . 'build/admin-reindex.js',
 			array(),
 			IHUMBAK_SEMANTIC_SEARCH_VERSION,
 			true
