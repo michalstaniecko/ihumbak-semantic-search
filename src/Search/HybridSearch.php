@@ -300,7 +300,8 @@ class HybridSearch {
 	 */
 	protected function get_fuzzy_search(): FuzzySearch {
 		if ( null === $this->fuzzy_search ) {
-			$this->fuzzy_search = new FuzzySearch();
+			// Pass SemanticSearch instance to FuzzySearch for semantic reranking capability.
+			$this->fuzzy_search = new FuzzySearch( 0.35, 200, $this->semantic_search );
 		}
 
 		return $this->fuzzy_search;
