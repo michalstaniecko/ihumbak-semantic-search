@@ -154,7 +154,9 @@ class FuzzySearch {
 			if ( empty( $reranked_results ) ) {
 				// Log warning if no results were returned from reranking.
 				if ( function_exists( 'error_log' ) ) {
-					error_log( 'Ihumbak Semantic Search: Semantic reranking returned no results for query: ' . $query );
+					// Sanitize query before logging to prevent log injection.
+					$sanitized_query = preg_replace( '/[^\w\s\-]/u', '', $query );
+					error_log( 'Ihumbak Semantic Search: Semantic reranking returned no results for query: ' . $sanitized_query );
 				}
 				// Fallback to original fuzzy search results.
 				return $post_ids;
@@ -173,7 +175,9 @@ class FuzzySearch {
 		} catch ( \Exception $e ) {
 			// Log error and fallback to fuzzy search results.
 			if ( function_exists( 'error_log' ) ) {
-				error_log( 'Ihumbak Semantic Search: Error during semantic reranking: ' . $e->getMessage() );
+				// Sanitize exception message before logging to prevent information disclosure.
+				$sanitized_message = preg_replace( '/[^\w\s\-:]/u', '', $e->getMessage() );
+				error_log( 'Ihumbak Semantic Search: Error during semantic reranking: ' . $sanitized_message );
 			}
 			return $post_ids;
 		}
