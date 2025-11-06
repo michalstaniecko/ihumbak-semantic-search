@@ -29,6 +29,13 @@ class FuzzySearch {
 	private int $candidate_limit;
 
 	/**
+	 * Optional semantic search instance for reranking
+	 *
+	 * @var SemanticSearch|null
+	 */
+	private ?SemanticSearch $semantic_search;
+
+	/**
 	 * Cache expiration time in seconds
 	 *
 	 * @var int
@@ -45,27 +52,33 @@ class FuzzySearch {
 	/**
 	 * Constructor
 	 *
-	 * @param float $min_threshold  Minimum similarity threshold (default: 0.35).
-	 * @param int   $candidate_limit Maximum candidates to check (default: 200).
+	 * @param float               $min_threshold    Minimum similarity threshold (default: 0.35).
+	 * @param int                 $candidate_limit  Maximum candidates to check (default: 200).
+	 * @param SemanticSearch|null $semantic_search  Optional semantic search instance for reranking.
 	 */
-	public function __construct( float $min_threshold = 0.35, int $candidate_limit = 200 ) {
-		$this->min_threshold  = $min_threshold;
+	public function __construct( float $min_threshold = 0.35, int $candidate_limit = 200, ?SemanticSearch $semantic_search = null ) {
+		$this->min_threshold   = $min_threshold;
 		$this->candidate_limit = $candidate_limit;
+		$this->semantic_search = $semantic_search;
 	}
 
 	/**
 	 * Search for posts using fuzzy matching
 	 *
-	 * @param string $search_query Search query string.
+	 * @param string $search_query          Search query string.
+	 * @param bool   $use_semantic_reranking Whether to use semantic reranking (default: true if SemanticSearch available).
 	 * @return array Array of post IDs sorted by similarity score
 	 */
-	public function search( string $search_query ): array {
+	public function search( string $search_query, bool $use_semantic_reranking = true ): array {
 		if ( empty( $search_query ) ) {
 			return array();
 		}
 
+		// Apply filter to allow disabling semantic reranking.
+		$use_semantic_reranking = apply_filters( 'ihumbak_fuzzy_search_use_semantic_reranking', $use_semantic_reranking );
+
 		// Check cache first.
-		$cache_key = 'ihumbak_fuzzy_search_' . md5( $search_query . $this->min_threshold );
+		$cache_key = 'ihumbak_fuzzy_search_' . md5( $search_query . $this->min_threshold . (int) $use_semantic_reranking );
 		$cached    = get_transient( $cache_key );
 
 		if ( false !== $cached ) {
@@ -115,10 +128,59 @@ class FuzzySearch {
 		// Extract post IDs.
 		$post_ids = array_column( $results, 'post_id' );
 
+		// Apply semantic reranking if enabled and SemanticSearch is available.
+		if ( $use_semantic_reranking && null !== $this->semantic_search && ! empty( $post_ids ) ) {
+			$post_ids = $this->apply_semantic_reranking( $search_query, $post_ids );
+		}
+
 		// Cache the results.
 		set_transient( $cache_key, $post_ids, self::CACHE_EXPIRATION );
 
 		return $post_ids;
+	}
+
+	/**
+	 * Apply semantic reranking to fuzzy search results
+	 *
+	 * @param string $query    Search query.
+	 * @param array  $post_ids Array of post IDs to rerank.
+	 * @return array Reranked array of post IDs
+	 */
+	protected function apply_semantic_reranking( string $query, array $post_ids ): array {
+		try {
+			// Use SemanticSearch to rerank the candidates.
+			$reranked_results = $this->semantic_search->rerank( $query, $post_ids, count( $post_ids ) );
+
+			if ( empty( $reranked_results ) ) {
+				// Log warning if no results were returned from reranking.
+				if ( function_exists( 'error_log' ) ) {
+					// Sanitize query before logging to prevent log injection.
+					$sanitized_query = preg_replace( '/[^\w\s\-]/u', '', $query );
+					error_log( 'Ihumbak Semantic Search: Semantic reranking returned no results for query: ' . $sanitized_query );
+				}
+				// Fallback to original fuzzy search results.
+				return $post_ids;
+			}
+
+			// Extract post IDs from reranked results.
+			$reranked_ids = array_column( $reranked_results, 'post_id' );
+
+			// Log if some embeddings were not found.
+			$missing_count = count( $post_ids ) - count( $reranked_ids );
+			if ( $missing_count > 0 && function_exists( 'error_log' ) ) {
+				error_log( sprintf( 'Ihumbak Semantic Search: %d embeddings not found during reranking', $missing_count ) );
+			}
+
+			return $reranked_ids;
+		} catch ( \Exception $e ) {
+			// Log error and fallback to fuzzy search results.
+			if ( function_exists( 'error_log' ) ) {
+				// Sanitize exception message before logging to prevent information disclosure.
+				$sanitized_message = preg_replace( '/[^\w\s\-:]/u', '', $e->getMessage() );
+				error_log( 'Ihumbak Semantic Search: Error during semantic reranking: ' . $sanitized_message );
+			}
+			return $post_ids;
+		}
 	}
 
 	/**

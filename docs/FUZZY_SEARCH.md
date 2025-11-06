@@ -65,6 +65,48 @@ $fuzzy = new \Ihumbak\SemanticSearch\Search\FuzzySearch( 0.25, 200 );
 $fuzzy = new \Ihumbak\SemanticSearch\Search\FuzzySearch( 0.50, 200 );
 ```
 
+### Integracja z SemanticSearch (Semantic Reranking)
+
+**Nowa funkcjonalność!** FuzzySearch może teraz wykorzystywać SemanticSearch do przeklasyfikowania wyników metodą semantic reranking:
+
+```php
+use Ihumbak\SemanticSearch\Search\FuzzySearch;
+use Ihumbak\SemanticSearch\Search\SemanticSearch;
+use Ihumbak\SemanticSearch\Database\EmbeddingsRepository;
+use Ihumbak\SemanticSearch\Database\Schema;
+use Ihumbak\SemanticSearch\OpenAI\Client;
+
+// Tworzenie instancji SemanticSearch
+$schema = new Schema();
+$repository = new EmbeddingsRepository( $schema );
+$client = new Client();
+$semantic = new SemanticSearch( $client, $repository );
+
+// FuzzySearch z semantic reranking
+$fuzzy = new FuzzySearch( 0.35, 200, $semantic );
+
+// Wyszukiwanie z automatycznym semantic reranking
+$results = $fuzzy->search( 'jak gotować mięso' ); // Znajdzie "przygotowanie steku"
+```
+
+**Korzyści z semantic reranking:**
+- ✅ Lepsze zrozumienie znaczenia zapytania (synonimy, kontekst)
+- ✅ "budżet dla rodzin" znajdzie "wymagania dotyczące dochodów rodzinnych"
+- ✅ Brak dodatkowych kosztów - embeddingi już wygenerowane podczas indeksowania
+- ✅ Automatyczne fallback do wyników FuzzySearch w przypadku błędu
+
+**Wyłączanie semantic reranking:**
+
+```php
+// Globalne wyłączenie przez filter
+add_filter( 'ihumbak_fuzzy_search_use_semantic_reranking', '__return_false' );
+
+// Wyłączenie dla konkretnego wyszukiwania
+$results = $fuzzy->search( 'zapytanie', false );
+```
+
+**Uwaga:** Semantic reranking działa tylko gdy embeddingi zostały wcześniej wygenerowane podczas indeksowania postów.
+
 ### Konfiguracja typów postów
 
 ```php
@@ -132,6 +174,7 @@ Zwrócone wyniki fuzzy search będą miały:
 ## Przyszłe ulepszenia
 
 Planowane rozszerzenia funkcjonalności:
+- [x] Integracja z SemanticSearch dla semantic reranking
 - [ ] Konfiguracja wag algorytmów przez WordPress filters
 - [ ] Wsparcie dla więcej języków
 - [ ] n-gram matching dla lepszej wydajności
