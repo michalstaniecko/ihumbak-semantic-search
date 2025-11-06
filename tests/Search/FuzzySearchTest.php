@@ -264,4 +264,120 @@ class FuzzySearchTest extends WP_UnitTestCase {
 		$fuzzy = new FuzzySearch( 0.50, 100 );
 		$this->assertInstanceOf( FuzzySearch::class, $fuzzy );
 	}
+
+	/**
+	 * Test constructor with SemanticSearch dependency
+	 */
+	public function test_constructor_with_semantic_search() {
+		// Create a mock SemanticSearch instance.
+		$mock_semantic_search = $this->createMock( \Ihumbak\SemanticSearch\Search\SemanticSearch::class );
+
+		$fuzzy = new FuzzySearch( 0.35, 200, $mock_semantic_search );
+		$this->assertInstanceOf( FuzzySearch::class, $fuzzy );
+	}
+
+	/**
+	 * Test search without semantic reranking
+	 */
+	public function test_search_without_semantic_reranking() {
+		// Create a mock SemanticSearch that should not be called.
+		$mock_semantic_search = $this->createMock( \Ihumbak\SemanticSearch\Search\SemanticSearch::class );
+		$mock_semantic_search->expects( $this->never() )
+			->method( 'rerank' );
+
+		$fuzzy = new FuzzySearch( 0.35, 200, $mock_semantic_search );
+
+		// Search with semantic reranking disabled.
+		$results = $fuzzy->search( 'wordpress', false );
+		$this->assertIsArray( $results );
+	}
+
+	/**
+	 * Test search with semantic reranking enabled
+	 */
+	public function test_search_with_semantic_reranking() {
+		// Create test post.
+		$post_id = $this->factory->post->create(
+			array(
+				'post_title'   => 'Test Post for Semantic Search',
+				'post_content' => 'Content about semantic search and reranking.',
+				'post_status'  => 'publish',
+			)
+		);
+
+		// Create a mock SemanticSearch that returns reranked results.
+		$mock_semantic_search = $this->createMock( \Ihumbak\SemanticSearch\Search\SemanticSearch::class );
+		$mock_semantic_search->method( 'rerank' )
+			->willReturn(
+				array(
+					array(
+						'post_id'    => $post_id,
+						'similarity' => 0.95,
+					),
+				)
+			);
+
+		$fuzzy = new FuzzySearch( 0.35, 200, $mock_semantic_search );
+
+		// Search with semantic reranking enabled (default).
+		$results = $fuzzy->search( 'semantic' );
+		$this->assertIsArray( $results );
+	}
+
+	/**
+	 * Test semantic reranking filter hook
+	 */
+	public function test_semantic_reranking_filter_hook() {
+		$mock_semantic_search = $this->createMock( \Ihumbak\SemanticSearch\Search\SemanticSearch::class );
+		$mock_semantic_search->expects( $this->never() )
+			->method( 'rerank' );
+
+		$fuzzy = new FuzzySearch( 0.35, 200, $mock_semantic_search );
+
+		// Add filter to disable semantic reranking.
+		add_filter(
+			'ihumbak_fuzzy_search_use_semantic_reranking',
+			function () {
+				return false;
+			}
+		);
+
+		$results = $fuzzy->search( 'wordpress' );
+		$this->assertIsArray( $results );
+
+		// Clean up filter.
+		remove_all_filters( 'ihumbak_fuzzy_search_use_semantic_reranking' );
+	}
+
+	/**
+	 * Test semantic reranking fallback when rerank returns empty
+	 */
+	public function test_semantic_reranking_fallback_empty() {
+		// Create a mock SemanticSearch that returns empty results.
+		$mock_semantic_search = $this->createMock( \Ihumbak\SemanticSearch\Search\SemanticSearch::class );
+		$mock_semantic_search->method( 'rerank' )
+			->willReturn( array() );
+
+		$fuzzy = new FuzzySearch( 0.35, 200, $mock_semantic_search );
+
+		// Should fallback to fuzzy results.
+		$results = $fuzzy->search( 'wordpress' );
+		$this->assertIsArray( $results );
+	}
+
+	/**
+	 * Test semantic reranking fallback on exception
+	 */
+	public function test_semantic_reranking_fallback_exception() {
+		// Create a mock SemanticSearch that throws an exception.
+		$mock_semantic_search = $this->createMock( \Ihumbak\SemanticSearch\Search\SemanticSearch::class );
+		$mock_semantic_search->method( 'rerank' )
+			->will( $this->throwException( new \Exception( 'Test exception' ) ) );
+
+		$fuzzy = new FuzzySearch( 0.35, 200, $mock_semantic_search );
+
+		// Should fallback to fuzzy results without throwing.
+		$results = $fuzzy->search( 'wordpress' );
+		$this->assertIsArray( $results );
+	}
 }
