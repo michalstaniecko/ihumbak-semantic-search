@@ -32,6 +32,9 @@
 				mode: this.$wrapper.data( 'mode' ) || 'hybrid',
 			};
 
+			// Flag to prevent URL updates when search is triggered from URL
+			this.skipUrlUpdate = false;
+
 			this.init();
 		}
 
@@ -208,6 +211,12 @@
 		}
 
 		updateUrl( query ) {
+			// Skip URL update if search was triggered from URL
+			if ( this.skipUrlUpdate ) {
+				this.skipUrlUpdate = false;
+				return;
+			}
+
 			const url = new URL( window.location );
 
 			if ( query ) {
@@ -216,7 +225,7 @@
 				url.searchParams.delete( 's' );
 			}
 
-			window.history.pushState( {}, '', url );
+			window.history.replaceState( {}, '', url );
 		}
 
 		checkUrlForSearch() {
@@ -225,6 +234,8 @@
 
 			if ( query ) {
 				this.$input.val( query );
+				// Set flag to prevent URL update when search is triggered from URL
+				this.skipUrlUpdate = true;
 				this.performSearch( query );
 			}
 		}
