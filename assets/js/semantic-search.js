@@ -32,6 +32,9 @@
 				mode: this.$wrapper.data( 'mode' ) || 'hybrid',
 			};
 
+			// Flag to prevent URL updates when search is triggered from URL
+			this.skipUrlUpdate = false;
+
 			this.init();
 		}
 
@@ -39,6 +42,9 @@
 			this.$form.on( 'submit', ( e ) => this.handleSubmit( e ) );
 			this.$clearButton.on( 'click', () => this.clearResults() );
 			this.$input.on( 'keyup', ( e ) => this.handleKeyup( e ) );
+
+			// Check for search query in URL on page load
+			this.checkUrlForSearch();
 		}
 
 		handleSubmit( e ) {
@@ -62,6 +68,9 @@
 		async performSearch( query ) {
 			this.showLoading();
 			this.hideError();
+
+			// Update URL with search query
+			this.updateUrl( query );
 
 			const params = new URLSearchParams( {
 				q: query,
@@ -196,6 +205,39 @@
 			this.$results.hide();
 			this.$resultsList.empty();
 			this.hideError();
+
+			// Remove search query from URL
+			this.updateUrl( '' );
+		}
+
+		updateUrl( query ) {
+			// Skip URL update if search was triggered from URL
+			if ( this.skipUrlUpdate ) {
+				this.skipUrlUpdate = false;
+				return;
+			}
+
+			const url = new URL( window.location );
+
+			if ( query ) {
+				url.searchParams.set( 's', query );
+			} else {
+				url.searchParams.delete( 's' );
+			}
+
+			window.history.replaceState( {}, '', url );
+		}
+
+		checkUrlForSearch() {
+			const urlParams = new URLSearchParams( window.location.search );
+			const query = urlParams.get( 's' );
+
+			if ( query ) {
+				this.$input.val( query );
+				// Set flag to prevent URL update when search is triggered from URL
+				this.skipUrlUpdate = true;
+				this.performSearch( query );
+			}
 		}
 
 		escapeHtml( text ) {
